@@ -1,7 +1,7 @@
-pandas
 sqlalchemy
 psycopg2-binary
-pyarrow
-matplotlib
-seaborn
+pandas
 python-dotenv
+pyarrow
+great_expectations
+matplotlib

@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: olist_gold
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -20,6 +20,10 @@ services:
     container_name: olist_bi
     ports:
       - "3000:3000"
+    volumes:
+      - ./metabase_data:/metabase-data  # Cria uma pasta no seu Windows para salvar a senha
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
     depends_on:
       - postgres
     networks:
@@ -31,3 +35,4 @@ networks:
 
 volumes:
   pgdata:
+  metabase_data:  # Adicione esta linha

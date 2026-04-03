@@ -28,17 +28,17 @@ O projeto segue a estrutura de camadas para garantir a qualidade do dado:
     📋 Estrutura de Pastas
 
     Lab01_PART2_NUSP/
+.
 ├── data/
-│   ├── bronze/       # Arquivos originais
-│   ├── silver/       # Arquivos processados em Parquet
+│   ├── bronze/            # Arquivos CSV originais (Raw)
+│   └── silver/            # Arquivos Parquet processados
 ├── scripts/
-│   ├── 01_bronze.py  # Ingestão inicial
-│   ├── 02_silver.py  # Limpeza e conversão
-│   └── 03_gold.py    # Modelagem e carga no Data Warehouse
-├── docker-compose.yml # Infraestrutura (Postgres e Metabase)
-├── .env               # Variáveis de ambiente e credenciais
-└── README.md          # Documentação do projeto
-
+│   ├── 01_bronze.py       # Script de ingestão inicial
+│   ├── 02_silver.py       # Script de limpeza e conversão
+│   └── 03_gold.py         # Script de modelagem e carga final
+├── .env                   # Variáveis de ambiente (credenciais)
+├── docker-compose.yml     # Configuração do Postgres e Metabase
+└── README.md              # Documentação do laboratório
 
 🔧 Configuração e Instalação
 1. Preparar o Ambiente

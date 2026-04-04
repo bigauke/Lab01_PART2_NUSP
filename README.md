@@ -87,5 +87,4 @@ Durante o desenvolvimento, foram aplicadas as seguintes soluções de suporte:
     Carga em Blocos: Uso de chunksize no to_sql para garantir a estabilidade do envio de grandes volumes de dados (Tabela Fato).
 
 
-
-    [Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)
+[Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)

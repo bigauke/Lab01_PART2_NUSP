@@ -21,13 +21,13 @@ Este documento descreve as tabelas e colunas da camada Gold, modeladas em Star S
 Contém os registros de transações de vendas. É a tabela central para cálculos de faturamento.
 
     Coluna	                    Tipo	        Descrição	                                            Regras de Negócio
-    order_id	                  UUID	        ID único do pedido.	                                    Chave primária.
-    customer_id	                UUID	        ID do cliente que realizou a compra.	                Chave estrangeira para dim_cliente.
-    product_id	                UUID	        ID do produto vendido.	                                Chave estrangeira para dim_produto.
-    order_status	              String	        Estado atual do pedido (ex: delivered, canceled).	    -
-    price	                      Float	        Valor de venda do produto.	                            Validado: deve ser > 0 na Camada Silver.
-    freight_value	              Float	        Valor do frete pago.	                                Validado: deve ser >= 0 na Camada Silver 
-    order_purchase_timestamp	  Datetime	    Data e hora em que a compra foi feita.	                -
+    order_id	                    UUID	        ID único do pedido.	                                    Chave primária.
+    customer_id	                    UUID	        ID do cliente que realizou a compra.	                Chave estrangeira para dim_cliente.
+    product_id	                    UUID	        ID do produto vendido.	                                Chave estrangeira para dim_produto.
+    order_status	                String	        Estado atual do pedido (ex: delivered, canceled).	    -
+    price	                        Float	        Valor de venda do produto.	                            Validado: deve ser > 0 na Camada Silver.
+    freight_value	                Float	        Valor do frete pago.	                                Validado: deve ser >= 0 na Camada Silver 
+    order_purchase_timestamp	    Datetime	    Data e hora em que a compra foi feita.	                -
 
 
 

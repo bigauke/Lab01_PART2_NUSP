@@ -1,17 +1,17 @@
 📖 Dicionário de Dados - Camada Gold
 Tabela: fato_vendas
-Coluna	        Descrição	            Regra de Negócio
-order_id	    ID único do pedido	    Chave primária da transação
-price	        Valor do item vendido	Validado: sempre > 0 na Silver
-freight_value	Valor do frete	        -
+    Coluna	        Descrição	            Regra de Negócio
+    order_id	    ID único do pedido	    Chave primária da transação
+    price	        Valor do item vendido	Validado: sempre > 0 na Silver
+    freight_value	Valor do frete	        -
 
 
 
 Tabela: dim_produto
 
-Coluna      	        Descrição
-product_id	            ID único do produto
-product_category_name	Nome da categoria em português
+    Coluna      	        Descrição
+    product_id	            ID único do produto
+    product_category_name	Nome da categoria em português
 
 📖 Dicionário de Dados - Olist Gold
 
@@ -35,18 +35,18 @@ Contém os registros de transações de vendas. É a tabela central para cálcul
 
 Contém os detalhes técnicos dos produtos cadastrados.
 
-Coluna	                Tipo	    Descrição
-product_id	            UUID	    ID único do produto.
-product_category_name	String	    Categoria do produto (ex: beleza_saude).
-product_weight_g	    Integer	    Peso do produto em gramas.
+    Coluna	                Tipo	    Descrição
+    product_id	            UUID	    ID único do produto.
+    product_category_name	String	    Categoria do produto (ex: beleza_saude).
+    product_weight_g	    Integer	    Peso do produto em gramas.
 
 
 👤 Tabela Dimensão: dim_cliente
 
 Contém as informações geográficas dos compradores.
 
-Coluna	            Tipo	    Descrição
-customer_id	        UUID	    ID único do cliente.
-customer_city	    String	    Cidade de residência do cliente.
-customer_state	    String	    Sigla do estado (UF).
+    Coluna	            Tipo	    Descrição
+    customer_id	        UUID	    ID único do cliente.
+    customer_city	    String	    Cidade de residência do cliente.
+    customer_state	    String	    Sigla do estado (UF).
 

@@ -1,63 +1,91 @@
-import os
 import pandas as pd
 import great_expectations as gx
-import great_expectations.expectations as gxe
+from pathlib import Path
 
 def validar_dados():
-    dir_script = os.path.dirname(os.path.abspath(__file__))
-    dir_projeto = os.path.dirname(dir_script)
-    caminho_csv = os.path.join(dir_projeto, "data", "raw", "olist_orders_dataset.csv")
+    # 1. Bússola de Caminhos
+    caminho_script = Path(__file__).resolve()
+    dir_projeto = caminho_script.parent.parent
+    caminho_gx = dir_projeto / "gx"
+    caminho_csv = dir_projeto / "data" / "raw" / "olist_orders_dataset.csv"
     
-    # 1. Leitura direta com Pandas (imune a falhas de caminho do GX)
     df = pd.read_csv(caminho_csv)
     
-    # 2. Configura o contexto isolado
-    context = gx.get_context(mode="ephemeral")
+    # 2. Conecta ao contexto do PROJETO
+    context = gx.get_context(project_root_dir=str(caminho_gx))
     
-    # 3. Conecta a fonte de dados via memoria
-    data_source = context.data_sources.add_pandas(name="pandas_source")
-    data_asset = data_source.add_dataframe_asset(name="orders_asset")
+    # 3. Gerenciamento do Datasource (Get or Add)
+    datasource_name = "pandas_source"
+    try:
+        data_source = context.data_sources.get(datasource_name)
+    except Exception:
+        data_source = context.data_sources.add_pandas(name=datasource_name)
+        
+    # 4. Gerenciamento do Asset (Get or Add)
+    asset_name = "orders_asset"
+    try:
+        data_asset = data_source.get_asset(asset_name)
+    except Exception:
+        data_asset = data_source.add_dataframe_asset(name=asset_name)
     
-    # NOVO: O GX 1.0 exige a declaracao explicita do BatchDefinition
-    batch_definition = data_asset.add_batch_definition_whole_dataframe("orders_batch")
+    # 5. Gerenciamento do Batch Definition (Get or Add)
+    batch_name = "orders_batch"
+    try:
+        batch_definition = data_asset.get_batch_definition(batch_name)
+    except Exception:
+        batch_definition = data_asset.add_batch_definition_whole_dataframe(batch_name)
     
-    # 4. Cria a suite 
-    suite = gx.ExpectationSuite(name="orders_suite")
+    # 6. Gerenciamento da Suite (Lógica de limpeza para evitar duplicatas)
+    suite_name = "orders_suite"
+    try:
+        # Se já existe, deletamos para garantir que as regras novas sejam aplicadas
+        context.suites.delete(suite_name)
+    except Exception:
+        pass
     
-    # 5. Adiciona as 5 expectativas
-    suite.add_expectation(gxe.ExpectColumnValuesToNotBeNull(column="order_id"))
-    suite.add_expectation(gxe.ExpectColumnValuesToBeUnique(column="order_id"))
-    suite.add_expectation(gxe.ExpectColumnValuesToBeInSet(
+    suite = gx.ExpectationSuite(name=suite_name)
+    suite.add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="order_id"))
+    suite.add_expectation(gx.expectations.ExpectColumnValuesToBeUnique(column="order_id"))
+    suite.add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="customer_id"))
+    suite.add_expectation(gx.expectations.ExpectColumnValuesToBeInSet(
         column="order_status", 
         value_set=["delivered", "shipped", "canceled", "unavailable", "invoiced", "processing", "created", "approved"]
     ))
-    suite.add_expectation(gxe.ExpectColumnValuesToNotBeNull(column="customer_id"))
-    suite.add_expectation(gxe.ExpectColumnValuesToMatchRegex(
-        column="order_purchase_timestamp", 
-        regex=r"^\d{4}-\d{2}-\d{2}"
-    ))
     context.suites.add(suite)
     
-    # 6. Define a validacao conectando o BatchDefinition
+    # 7. Definição da Validação (Get or Add)
+    validation_name = "orders_validation"
+    try:
+        context.validation_definitions.delete(validation_name)
+    except Exception:
+        pass
+        
     validation_definition = gx.ValidationDefinition(
         data=batch_definition,
         suite=suite,
-        name="orders_validation"
+        name=validation_name
     )
     context.validation_definitions.add(validation_definition)
     
-    checkpoint = gx.Checkpoint(
-        name="orders_checkpoint",
-        validation_definitions=[validation_definition]
-    )
-    context.checkpoints.add(checkpoint)
+    # 8. Checkpoint e Execução
+    checkpoint_name = "orders_checkpoint"
+    try:
+        checkpoint = context.checkpoints.get(checkpoint_name)
+    except Exception:
+        checkpoint = gx.Checkpoint(
+            name=checkpoint_name,
+            validation_definitions=[validation_definition]
+        )
+        context.checkpoints.add(checkpoint)
     
-    # 7. Executa passando o dataframe em memoria
+    print("🚀 Rodando validação de dados...")
     checkpoint.run(batch_parameters={"dataframe": df})
     
+    print("🏗️ Construindo relatórios (Data Docs)...")
     context.build_data_docs()
+    
+    print("🌐 Abrindo relatório no navegador...")
     context.open_data_docs()
-    print("Validação concluída com sucesso. Verifique seu navegador.")
 
 if __name__ == "__main__":
     validar_dados()

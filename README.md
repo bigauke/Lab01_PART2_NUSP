@@ -1,91 +1,62 @@
-Lab01 - Pipeline de Dados E-commerce (Olist)
+# 📦 Pipeline de Dados Olist - NUSP
 
-Este projeto documenta a construção de um pipeline de dados completo, desde a ingestão de dados brutos até a visualização em um dashboard de Business Intelligence, utilizando a arquitetura de medalhão (Bronze, Silver e Gold).
-🚀 Tecnologias Utilizadas
+Este projeto automatiza a carga, transformação e validação de dados da Olist usando uma arquitetura medalhão.
 
-    Docker & Docker Compose: Orquestração de containers para o banco de dados e ferramenta de BI.
+## 🛠️ Requisitos Prévios
 
-    PostgreSQL 15: Data Warehouse para armazenamento da camada Gold.
+- Docker e Docker Compose instalados.
+- Python 3.13 (para execução local dos scripts).
 
-    Python 3.12: Linguagem principal para processamento e transformação de dados.
+## 🚀 Guia de Reprodução do Ambiente
 
-    Pandas: Manipulação e limpeza de dados (Data Wrangling).
+Siga os passos abaixo para subir a infraestrutura e processar os dados.
 
-    SQLAlchemy / Psycopg2: Conexão e carga de dados no banco relacional.
+### 1. Construir a Imagem Docker
 
-    Metabase: Ferramenta de visualização de dados e criação de dashboards.
+Se o seu projeto possui um Dockerfile customizado para o script ou para o Metabase, execute:
 
-🏗️ Arquitetura do Projeto
+```bash
+docker-compose build
+```
 
-O projeto segue a estrutura de camadas para garantir a qualidade do dado:
+Este comando garante que todas as dependências e bibliotecas Python necessárias estejam embutidas na imagem.
 
-    Bronze (Raw): Dados brutos extraídos da fonte original.
+### 2. Subir os Containers
 
-    Silver (Clean): Dados limpos e convertidos para o formato .parquet, garantindo performance e tipagem correta.
+Para iniciar o banco de dados PostgreSQL e a instância do Metabase, use:
 
-    Gold (Curated): Modelagem em Star Schema (Esquema Estrela) composta por tabelas de dimensões e uma tabela fato, otimizada para análise de negócios.
-
-    📋 Estrutura de Pastas
-
-    Lab01_PART2_NUSP/
-    .
-    ├── data/
-    │   ├── bronze/            # Arquivos CSV originais (Raw)
-    │   └── silver/            # Arquivos Parquet processados
-    ├── scripts/
-    │   ├── 01_bronze.py       # Script de ingestão inicial
-    │   ├── 02_silver.py       # Script de limpeza e conversão
-    │   └── 03_gold.py         # Script de modelagem e carga final
-    ├── .env                   # Variáveis de ambiente (credenciais)
-    ├── docker-compose.yml     # Configuração do Postgres e Metabase
-    └── README.md              # Documentação do laboratório
-
-🔧 Configuração e Instalação
-1. Preparar o Ambiente
-
-Crie e ative seu ambiente virtual:
-
-
-python -m venv venv
-.\venv\Scripts\activate
-pip install pandas sqlalchemy psycopg2-binary python-dotenv pyarrow
-
-2. Subir a Infraestrutura
-
-Certifique-se de que o Docker está rodando e execute:
-
+```bash
 docker-compose up -d
+```
 
-Nota: O banco de dados está configurado na porta 5433 para evitar conflitos com instalações locais do Postgres no Windows.
+Aguarde alguns segundos para que o banco de dados esteja pronto para receber conexões.
 
+### 3. Executar as Validações do Great Expectations
 
-3. Executar o Pipeline
+Com o ambiente ativo, você deve rodar o script de validação para garantir a qualidade dos dados na camada Gold:
 
-Rode os scripts na ordem correta para processar os dados:
+```bash
+# Ative seu ambiente virtual (Windows)
+.\venv\Scripts\activate
 
-python .\scripts\02_silver.py
-python .\scripts\03_gold.py
+# Execute o script de Data Quality
+python .\scripts\gx_validation.py
+```
 
+O script verificará a unicidade de IDs, valores nulos e integridade dos status. Ao final, o relatório Data Docs abrirá automaticamente no seu navegador.
 
-📊 Visualização de Dados (Metabase)
+## 📊 Estrutura Analítica (Dashboard)
 
-Após a carga da camada Gold, o Metabase foi conectado ao banco olist_gold para a criação do Painel Olist.
-Principais Insights Gerados:
+Após a execução, acesse localhost:3000 para configurar o Metabase e visualizar:
 
-    Faturamento por Categoria: Identificação das categorias que mais geram receita para o negócio.
+- Faturamento por Categoria
+- Evolução de Vendas
+- Distribuição Regional (Mapa)
+- Preço vs. Frete
+- Ranking de Estados
 
-    Modelagem Estelar: Integração das tabelas dim_cliente, dim_produto e fato_vendas através de chaves primárias (Product ID).
+## 🚦 Status de Qualidade
 
-🛠️ Solução de Problemas (Troubleshooting)
-
-Durante o desenvolvimento, foram aplicadas as seguintes soluções de suporte:
-
-    Conflito de Porta: Alteração da porta padrão do Postgres de 5432 para 5433.
-
-    Erro de Encoding (Unicode): Implementação de lc_messages=en_US.UTF-8 na conexão do SQLAlchemy para tratar mensagens de erro do sistema.
-
-    Carga em Blocos: Uso de chunksize no to_sql para garantir a estabilidade do envio de grandes volumes de dados (Tabela Fato).
-
-
-
-    [Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)
+- Camada Bronze ➔ Silver ➔ Gold: Concluída
+- Testes Great Expectations: 🟢 100% Passed
+- Reprodutibilidade: Validada via Docker

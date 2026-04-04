@@ -1,48 +1,72 @@
-import os
 import pandas as pd
+from pathlib import Path
+import os
 
-def processar_silver():
-    # Ancorar os caminhos na raiz do projeto
-    dir_script = os.path.dirname(os.path.abspath(__file__))
-    dir_projeto = os.path.dirname(dir_script)
+def validar_e_limpar_silver():
+    print("--- 🛡️ Iniciando Validação e Limpeza (Camada Silver) ---")
     
-    caminho_raw = os.path.join(dir_projeto, "data", "raw")
-    caminho_silver = os.path.join(dir_projeto, "data", "silver")
+    # Bússola de Caminhos
+    caminho_script = Path(__file__).resolve()
+    dir_projeto = caminho_script.parent.parent
     
-    os.makedirs(caminho_silver, exist_ok=True)
-    
-    tabelas_foco = [
-        "olist_orders_dataset.csv",
-        "olist_order_items_dataset.csv",
-        "olist_products_dataset.csv",
-        "olist_customers_dataset.csv",
-        "olist_order_payments_dataset.csv"
-    ]
-    
-    for arquivo in tabelas_foco:
-        caminho_completo = os.path.join(caminho_raw, arquivo)
-        df = pd.read_csv(caminho_completo)
+    # Ajustado para usar a pasta 'raw' conforme sua imagem
+    caminho_raw = dir_projeto / "data" / "raw"
+    caminho_silver = dir_projeto / "data" / "silver"
+
+    caminho_silver.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # VALIDAÇÃO: PEDIDOS
+        print(f"🔍 Analisando: olist_orders_dataset.csv")
+        df_orders = pd.read_csv(caminho_raw / "olist_orders_dataset.csv")
+
+        # Qualidade 01: Remover pedidos sem ID
+        nulos_id = df_orders['order_id'].isna().sum()
+        if nulos_id > 0:
+            print(f"⚠️ Removendo {nulos_id} registros com order_id nulo.")
+            df_orders = df_orders.dropna(subset=['order_id'])
+
+        # Qualidade 02: Tipagem de Datas
+        colunas_data = ['order_purchase_timestamp', 'order_delivered_customer_date']
+        for col in colunas_data:
+            df_orders[col] = pd.to_datetime(df_orders[col], errors='coerce')
+
+        # VALIDAÇÃO: ITENS
+        print(f"🔍 Analisando: olist_order_items_dataset.csv")
+        df_items = pd.read_csv(caminho_raw / "olist_order_items_dataset.csv")
+
+        # Qualidade 03: Preços Negativos
+        precos_ruins = df_items[df_items['price'] <= 0].shape[0]
+        if precos_ruins > 0:
+            print(f"⚠️ Corrigindo {precos_ruins} itens com preço inválido.")
+            df_items.loc[df_items['price'] <= 0, 'price'] = 0.01
+
+        # SALVAMENTO NA SILVER (PARQUET)
+        print("💾 Convertendo para Parquet...")
+        df_orders.to_parquet(caminho_silver / "olist_orders_dataset.parquet", index=False)
+        df_items.to_parquet(caminho_silver / "olist_order_items_dataset.parquet", index=False)
         
-        df = df.drop_duplicates()
+        # Processar demais arquivos necessários para a camada Gold
+        arquivos_restantes = [
+            "olist_customers_dataset.csv", 
+            "olist_products_dataset.csv",
+            "olist_order_payments_dataset.csv"
+        ]
         
-        if arquivo == "olist_orders_dataset.csv":
-            colunas_data = [
-                "order_purchase_timestamp",
-                "order_approved_at",
-                "order_delivered_carrier_date",
-                "order_delivered_customer_date",
-                "order_estimated_delivery_date"
-            ]
-            for col in colunas_data:
-                df[col] = pd.to_datetime(df[col])
-            
-            df = df.dropna(subset=["order_approved_at"])
-        
-        nome_parquet = arquivo.replace(".csv", ".parquet")
-        caminho_saida = os.path.join(caminho_silver, nome_parquet)
-        
-        df.to_parquet(caminho_saida, index=False)
-        print(f"Tratado e salvo: {nome_parquet}")
+        for arq in arquivos_restantes:
+            caminho_arq = caminho_raw / arq
+            if caminho_arq.exists():
+                temp_df = pd.read_csv(caminho_arq)
+                nome_saida = arq.replace(".csv", ".parquet")
+                temp_df.to_parquet(caminho_silver / nome_saida, index=False)
+                print(f"✅ {arq} processado.")
+
+        print("\n✅ Camada Silver validada com sucesso!")
+
+    except FileNotFoundError as e:
+        print(f"❌ Erro: Não encontrei a pasta ou arquivo em {caminho_raw}")
+    except Exception as e:
+        print(f"❌ Erro inesperado: {e}")
 
 if __name__ == "__main__":
-    processar_silver()
+    validar_e_limpar_silver()

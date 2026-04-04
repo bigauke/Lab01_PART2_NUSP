@@ -65,4 +65,4 @@ Durante o desenvolvimento, foram aplicadas as seguintes soluções de suporte:
 
 
 
-    [Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)
+[Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)

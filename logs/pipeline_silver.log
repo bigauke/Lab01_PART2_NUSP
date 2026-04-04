@@ -1,0 +1,14 @@
+2026-04-03 23:43:26,112 - INFO - Analisando: olist_orders_dataset.csv
+2026-04-03 23:43:27,058 - INFO - Analisando: olist_order_items_dataset.csv
+2026-04-03 23:43:27,401 - INFO - Convertendo arquivos para Parquet na Silver...
+2026-04-03 23:43:28,053 - INFO - Sucesso: olist_customers_dataset.csv processado.
+2026-04-03 23:43:28,176 - INFO - Sucesso: olist_products_dataset.csv processado.
+2026-04-03 23:43:28,391 - INFO - Sucesso: olist_order_payments_dataset.csv processado.
+2026-04-03 23:46:12,886 - INFO - --- 🛡️ Iniciando Validação e Limpeza (Camada Silver) ---
+2026-04-03 23:46:12,887 - INFO - Analisando: olist_orders_dataset.csv
+2026-04-03 23:46:13,600 - INFO - Analisando: olist_order_items_dataset.csv
+2026-04-03 23:46:13,988 - INFO - Convertendo arquivos para Parquet na Silver...
+2026-04-03 23:46:14,514 - INFO - Sucesso: olist_customers_dataset.csv processado.
+2026-04-03 23:46:14,613 - INFO - Sucesso: olist_products_dataset.csv processado.
+2026-04-03 23:46:14,776 - INFO - Sucesso: olist_order_payments_dataset.csv processado.
+2026-04-03 23:46:14,776 - INFO - ✅ Camada Silver validada e logs registrados.

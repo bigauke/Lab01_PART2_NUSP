@@ -85,3 +85,7 @@ Durante o desenvolvimento, foram aplicadas as seguintes soluções de suporte:
     Erro de Encoding (Unicode): Implementação de lc_messages=en_US.UTF-8 na conexão do SQLAlchemy para tratar mensagens de erro do sistema.
 
     Carga em Blocos: Uso de chunksize no to_sql para garantir a estabilidade do envio de grandes volumes de dados (Tabela Fato).
+
+
+
+    [Veja o Dicionário de Dados detalhado aqui](./DICIONARIO.md)
